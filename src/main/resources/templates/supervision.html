@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="en">
+<head>
+
+</head>
+<body>
+<!-- Content Wrapper. Contains page content -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 id="h1-supervision">Supervision</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Supervision des imprimantes</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <!--<h3 class="card-title">Liste des Imprimantes</h3>-->
+                    <button type="button" class="btn-reboot-supervision btn btn-danger" id="btn-reboot-supervision"
+                            title="Redémarrer l'imprimante" alt="Rescan"><i class="fas fa-sync"></i></button>
+
+                    <div style="float: right">
+                        <button type="button" class="btn-new-supervision btn btn-info" id="btn-new-supervision"
+                                title="Lancer un autre scan" alt="Rescan"><i class="fas fa-redo"></i></button>
+                        <button type="button" class="btn-image-supervision btn btn-success" id="btn-image-supervision"
+                                title="Afficher Etiquette" alt="Afficher Etiquette"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <hidden id="scannedipadresse"></hidden>
+                    <hidden id="scannedmarque"></hidden>
+
+                </div>
+                <!-- /.card-header -->
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <b>Etat de l'mprimante</b>
+                                </div>
+                                <div class="card-body; font-size: 20%;">
+                                    <table class="table table-sm table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><b>Status</b></td>
+                                            <td id="printstatut"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Durée de fonctionnement</b></td>
+                                            <td id="printeruptime"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Usage CPU</b></td>
+                                            <td id="cpuusage"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--<footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <b>Config Imprimante</b>
+                                </div>
+                                <div class="card-body; font-size: 20%;">
+                                    <table class="table table-sm table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><b>Adresse IP</b></td>
+                                            <td id="ipadresse"><img id="image-ip-state-scanedip" height="24px"
+                                                                    width="24px" src="" alt=""/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Adresse Mac</b></td>
+                                            <td id="ethernetmac"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Numéro série</b></td>
+                                            <td id="serialnumber"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--<footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <b>Autres Informations</b>
+                                </div>
+                                <div class="card-body; font-size: 20%;">
+                                    <table class="table table-sm table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><b>Version du Firmware</b></td>
+                                            <td id="firmwareversion"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Version de l'imprimante</b></td>
+                                            <td id="configurationnumber"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Langage</b></td>
+                                            <td id="commandlanguage"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--<footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <b>Information sur la Mémoire</b>
+                                </div>
+                                <div class="card-body; font-size: 20%;">
+                                    <table class="table table-sm table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><b>Mémoire Flash Utilisée</b></td>
+                                            <td id="usedstorage"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Mémoire Flash Dispo</b></td>
+                                            <td id="freestorage"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Total Flash</b></td>
+                                            <td id="totalstorage"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Mémoire RAM Utilisée</b></td>
+                                            <td id="usedram"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Mémoire RAM Dispo</b></td>
+                                            <td id="freeram"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Total RAM</b></td>
+                                            <td id="totalram"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--<footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <b>Information sur le Média</b>
+                                </div>
+                                <div class="card-body; font-size: 20%;">
+                                    <table class="table table-sm table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><b>Utilisation Ruban</b></td>
+                                            <td id="printmethodribbon"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Type de Média</b></td>
+                                            <td id="mediatype"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Marjin X</b></td>
+                                            <td id="marjinx"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Largeur Média</b></td>
+                                            <td id="mediawidth"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Longueur Média</b></td>
+                                            <td id="medialenght"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b> </b></td>
+                                            <td></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--<footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <b>Information sur la tête d'impression</b>
+                                </div>
+                                <div class="card-body; font-size: 20%;">
+                                    <table class="table table-sm table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><b>Nombre des dots défectueux</b></td>
+                                            <td id="faultydots"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Total Impression de la tête en métre</b></td>
+                                            <td id="totaldistanceprinthead"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Total étiquettes imprimées</b></td>
+                                            <td id="printedlabels"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Longeur impression en métres</b></td>
+                                            <td id="totaldistanceprint"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Température de la tête (°C)</b></td>
+                                            <td id="minimumtemperature"></td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                    <!--<footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <!-- /.card-body -->
+                </div>
+
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+
+</section>
+
+<div class="modal fade" id="modal-supervision" tabindex="-1" role="dialog" aria-labelledby="modal-supervision-titre"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--  Modal Header &ndash;&gt; -->
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modal-supervision-titre">
+                    <b>Séléctionner une Imprimante</b>
+                </h5>
+            </div>
+
+            <!--  Modal Body -->
+            <div class="modal-body">
+                <div id="alert-supervision-ajoutmodal" style="margin: 20px;">
+
+                </div>
+                <hidden id="pingstate"></hidden>
+
+                <form role="form" id="form-supervision" name="form-Supervision">
+                    <div class="row">
+                        <div class="form-group">
+                            Ligne :
+                            <select class="selectpicker form-control" data-live-search="true"
+                                    id="text-supervision-ligne" name="text-supervision-ligne" tabindex="6"
+                                    required="true">
+                                <option th:each="ligne : ${lignes}" th:value="${ligne.idligne}"
+                                        th:data-tokens="${ligne.desligne}"
+                                        th:text="${'L' + #numbers.formatInteger(ligne.idligne,3)+' | '+ ligne.chantiersByIdchantier.stationsByIdstation.desstation + ' | ' + ligne.chantiersByIdchantier.deschantier + ' | ' + ligne.desligne}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Type :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-supervision-type" name="text-supervision-type" tabindex="6"
+                                        required="true">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            </br>
+                            <img id="image-ip-state-supervision" height="24px" width="24px" src="" alt=""/>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" id="btn-supervision-fermer">Fermer</button>
+                        <button type="submit" class="btn btn-primary" id="btn-supervision-valider">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Creates the bootstrap modal where the image will appear -->
+<div class="modal fade" id="modal-image-supervision" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+                <!--<h4 class="modal-title" id="myModalLabel">Image preview</h4>-->
+            </div>
+            <div class="modal-body">
+                <img src="" id="imagepreview-supervision" style="width: 90%; height: 90%;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.content -->
+<!-- page script -->
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+    });
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#modal-supervision").modal('show');
+        }, 1000);
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="en">
+<head>
+    <style>
+        #imprimante_contextMenu {
+            position: absolute;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- Content Wrapper. Contains page content -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Imprimantes</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Gestion des Imprimantes</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <!--<h3 class="card-title">Liste des Imprimantes</h3>-->
+                    <button type="button" class="btn-new-printer btn btn-success btn-sm" id="btn-new-printer"
+                            title="Ajouter un nouveau Imprimante" alt="Ajouter l'Imprimante"><i
+                            class="fas fa-newspaper"></i></button>
+                    <button type="button" class="btn-export-printer btn btn-success btn-sm" id="btn-export-printer"
+                            title="Exporter la liste en Excel" alt="Exporter la liste en Excel"><i
+                            class="fas fa-file-export"></i></button>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="printerTable" class="table table-bordered table-hover table-sm">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th style="display: none;">id</th>
+                                <th>Identifiant</th>
+                                <th>Station</th>
+                                <th>Chantier</th>
+                                <th>Ligne</th>
+                                <th>Type</th>
+                                <th>Adresse IP</th>
+                                <th>Marque</th>
+                                <th>Modèle</th>
+                                <th>Etat</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="printer : ${printers}">
+                                <td style="display: none;" th:text="${printer.idmateriel}"></td>
+                                <td th:text="${'PR' + #numbers.formatInteger(printer.idmateriel,5)}"></td>
+                                <td th:text="${printer.lignesByIdligne.chantiersByIdchantier.stationsByIdstation.desstation}"></td>
+                                <td th:text="${printer.lignesByIdligne.chantiersByIdchantier.deschantier}"></td>
+                                <td th:text="${printer.lignesByIdligne.desligne}"></td>
+                                <td th:text="${printer.typemateriel}"></td>
+                                <td th:text="${printer.ipmateriel}"></td>
+                                <td th:text="${printer.marquemateriel}"></td>
+                                <td th:text="${printer.modelmateriel}"></td>
+                                <td>
+                                                <span th:switch="${printer.etatmateriel}">
+                                                    <img th:case="0" src="/dist/img/redball.png"
+                                                         alt="Compte Désactivée">
+                                                    <img th:case="1" src="/dist/img/greenball.png" alt="Compte Actif">
+                                                </span>
+                                </td>
+                                <td class="btn-printer" th:id="${printer.idmateriel}">
+                                    <button type="button" class="btn-info-printer btn btn-info btn-sm"
+                                            name="btn-info-printer" th:id="${printer.idmateriel}"><i
+                                            class="fas fa-search" alt="Informations sur l'Imprimante"></i></button>
+
+                                    <th:block th:switch="${printer.etatmateriel}">
+                                        <th:block th:case="1">
+                                            <button type="button" class="btn-edit-printer btn btn-success btn-sm"
+                                                    name="btn-edit-printer" th:id="${printer.idmateriel}"><i
+                                                    class="fas fa-edit" alt="Modifier l'Imprimante"></i></button>
+                                            <button type="button" class="btn-delete-printer btn btn-danger btn-sm"
+                                                    th:name="${printer.ipmateriel}" th:id="${printer.idmateriel}"><i
+                                                    class="fas fa-user-times" alt="Supprimer l'Imprimante"></i></button>
+                                        </th:block>
+                                    </th:block>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+
+    <!-- /.row -->
+</section>
+
+<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="menu" style="display: none;">
+    <a class="dropdown-item" href="#">Afficher plus d'information</a>
+    <a class="dropdown-item" href="#">Modifier</a>
+    <a class="dropdown-item" href="#">Supprimer</a>
+</div>
+
+<!-- NOUVEAU Modal -->
+<div class="modal fade" id="modal-printers-nouveau" tabindex="-1" role="dialog"
+     aria-labelledby="modal-printers-noveau-titre"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--  Modal Header &ndash;&gt; -->
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modal-printers-noveau-titre">
+                    Ajout d'un Imprimante
+                </h5>
+            </div>
+
+            <!--  Modal Body -->
+            <div class="modal-body">
+                <div id="alert-printers-ajoutmodal" style="margin: 20px;">
+
+                </div>
+
+                <form role="form" id="form-printers-nouveau" name="form-printers-nouveau">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Marque :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-printers-nouveau-marque" name="text-printers-nouveau-marque"
+                                        tabindex="6" required="true">
+                                    <option>Avery</option>
+                                    <option>Intermec</option>
+                                    <option>Markem</option>
+                                    <option>Novexx</option>
+                                    <option>Zebra</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Modèle :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-printers-nouveau-modele" name="text-printers-nouveau-modele"
+                                        tabindex="6" required="true">
+                                    <option>ALX 924</option>
+                                    <option>PC43T</option>
+                                    <option>PD43</option>
+                                    <option>PM43</option>
+                                    <option>SMARTDATE X40</option>
+                                    <option>SMARTDATE X60</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Adresse ip :
+                                <input type="text" maxlength="15" name="text-printers-nouveau-ip"
+                                       id="text-printers-nouveau-ip" class="form-control input-lg"
+                                       placeholder="Adresse Ip" tabindex="4" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Type :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-printers-nouveau-type" name="text-printers-nouveau-type" tabindex="6"
+                                        required="true">
+                                    <option>COLIS</option>
+                                    <option>UVC</option>
+                                    <option>MARKEM</option>
+                                    <option>X3</option>
+                                    <option>SPOULER</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Utilisateur :
+                                <input type="text" maxlength="15" name="text-printers-nouveau-user"
+                                       id="text-printers-nouveau-user" class="form-control input-lg"
+                                       placeholder="Nom Utilisateur" tabindex="4" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Mot de passe :
+                                <input type="password" maxlength="15" name="text-printers-nouveau-password"
+                                       id="text-printers-nouveau-password" class="form-control input-lg"
+                                       placeholder="Mot de passe" tabindex="4" required="true">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        Affectation Ligne :
+                        <select class="selectpicker form-control" data-live-search="true"
+                                id="text-printers-nouveau-ligne" name="text-printers-nouveau-ligne" tabindex="6"
+                                required="true">
+                            <option th:each="ligne : ${lignes}" th:data-tokens="${ligne.desligne}"
+                                    th:value="${ligne.idligne}"
+                                    th:text="${'L' + #numbers.formatInteger(ligne.idligne,3)+' | '+ ligne.chantiersByIdchantier.stationsByIdstation.desstation + ' | ' + ligne.chantiersByIdchantier.deschantier + ' | ' + ligne.desligne}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        Description :
+                        <textarea rows="4" cols="50" maxlength="200" name="text-printers-nouveau-description"
+                                  id="text-printers-nouveau-description" class="form-control input-lg"
+                                  placeholder="Description" tabindex="4"></textarea>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" id="btn-printers-nouveau-fermer">Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btn-printers-valider-fermer">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modif Modal-->
+<div class="modal fade" id="modal-printers-modif" tabindex="-1" role="dialog"
+     aria-labelledby="modal-printers-modif-titre"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--  Modal Header &ndash;&gt; -->
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modal-printers-modif-titre">
+                    Ajout d'un Imprimante
+                </h5>
+            </div>
+
+            <!--  Modal Body -->
+            <div class="modal-body">
+                <div id="alert-printers-modifmodal" style="margin: 20px;">
+
+                </div>
+
+                <form role="form" id="form-printers-modif" name="form-printers-modif">
+                    <input type="hidden" id="hidded-id" name="hidded-id">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Marque :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-printers-modif-marque" name="text-printers-modif-marque" tabindex="6"
+                                        required="true">
+                                    <option value="Avery">Avery</option>
+                                    <option value="Intermec">Intermec</option>
+                                    <option value="Markem">Markem</option>
+                                    <option value="Novexx">Novexx</option>
+                                    <option value="Zebra">Zebra</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Modèle :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-printers-modif-modele" name="text-printers-modif-modele" tabindex="6"
+                                        required="true">
+                                    <option value="ALX 924">ALX 924</option>
+                                    <option value="PC43T">PC43T</option>
+                                    <option value="PD43">PD43</option>
+                                    <option value="PM43">PM43</option>
+                                    <option value="SMARTDATE X40">SMARTDATE X40</option>
+                                    <option value="SMARTDATE X60">SMARTDATE X60</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Adresse ip :
+                                <input type="text" maxlength="15" name="text-printers-modif-ip"
+                                       id="text-printers-modif-ip" class="form-control input-lg"
+                                       placeholder="Adresse Ip" tabindex="4" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Type :
+                                <select class="selectpicker form-control" data-live-search="true"
+                                        id="text-printers-modif-type" name="text-printers-modif-type" tabindex="6"
+                                        required="true">
+                                    <option value="COLIS">COLIS</option>
+                                    <option value="UVC">UVC</option>
+                                    <option value="MARKEM">MARKEM</option>
+                                    <option value="X3">X3</option>
+                                    <option value="SPOULER">SPOULER</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Utilisateur :
+                                <input type="text" maxlength="15" name="text-printers-modif-user"
+                                       id="text-printers-modif-user" class="form-control input-lg"
+                                       placeholder="Nom Utilisateur" tabindex="4" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Mot de passe :
+                                <input type="password" maxlength="15" name="text-printers-modif-password"
+                                       id="text-printers-modif-password" class="form-control input-lg"
+                                       placeholder="Mot de passe" tabindex="4" required="true">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        Affectation Ligne :
+                        <select class="selectpicker form-control" data-live-search="true" id="text-printers-modif-ligne"
+                                name="text-printers-modif-ligne" tabindex="6" required="true">
+                            <option th:each="ligne : ${lignes}" th:data-tokens="${ligne.desligne}"
+                                    th:value="${ligne.idligne}"
+                                    th:text="${'L' + #numbers.formatInteger(ligne.idligne,3)+' | '+ ligne.chantiersByIdchantier.stationsByIdstation.desstation + ' | ' + ligne.chantiersByIdchantier.deschantier + ' | ' + ligne.desligne}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        Description :
+                        <textarea rows="4" cols="50" maxlength="200" name="text-printers-modif-description"
+                                  id="text-printers-modif-description" class="form-control input-lg"
+                                  placeholder="Description" tabindex="4"></textarea>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" id="btn-printers-modif-fermer">Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btn-printers-modif-valider">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-printers-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #FF7373">
+                <h4 class="modal-title" id="myModalLabel">Confirmation de Suppression d'un Imprimante</h4>
+            </div>
+            <div class="modal-body">
+                <div id="alert-printers-deletemodal" style="margin: 20px;">
+
+                </div>
+
+                <div class="form-group">
+                    <input type="hidden" id="hidded-id-delete" name="hidded-id-delete">
+                    <input type="hidden" id="hidded-ip-delete" name="hidded-ip-delete">
+                    <p id="text-printers-modal-delete">Voulez vous vraiment supprimer cet Imprimante ?</p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal" id="btn-printers-delete-n">Non</button>
+                <button class="btn btn-danger" id="btn-printers-delete-o">Oui</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.content -->
+<!-- page script -->
+<script>
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+    });
+
+    $('#text-printers-nouveau-email').keyup(function () {
+        this.value = this.value.toLowerCase();
+    });
+
+    $('#text-printers-modif-email').keyup(function () {
+        this.value = this.value.toLowerCase();
+    });
+
+    $('#text-printers-modif-nom').keyup(function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    $('#text-printers-nouveau-nom').keyup(function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    $('#text-printers-modif-prenom').keyup(function () {
+        $(this).val($(this).val().substr(0, 1).toUpperCase() + $(this).val().substr(1).toLowerCase());
+    });
+
+    $('#text-printers-nouveau-prenom').keyup(function () {
+        $(this).val($(this).val().substr(0, 1).toUpperCase() + $(this).val().substr(1).toLowerCase());
+    });
+
+    $(document).on("input", "#text-printers-nouveau-telephone", function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    $(document).on("input", "#text-printers-modif-telephone", function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    $(function () {
+        var table = $('#printerTable').DataTable({
+            "paging": true,
+            "pageLength": 100,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+        });
+    });
+
+
+</script>
+</body>
+</html>

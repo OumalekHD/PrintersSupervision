@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="en">
+<head>
+
+</head>
+<body>
+<!-- Content Wrapper. Contains page content -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Utilisateurs</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Gestion des utilisateurs</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <!--<h3 class="card-title">Liste des utilisateurs</h3>-->
+                    <button type="button" class="btn-new-user btn btn-success btn-sm" id="btn-new-user"
+                            title="Ajouter un nouveau utilisateur" alt="Ajouter l'Utilisateur"><i
+                            class="fas fa-newspaper"></i></button>
+                    <button type="button" class="btn-export-user btn btn-success btn-sm" id="btn-export-user"
+                            title="Exporter la liste en Excel" alt="Exporter la liste en Excel"><i
+                            class="fas fa-file-export"></i></button>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <table id="UserTable" class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Identifiant Utilisateur</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Profile</th>
+                            <th>Etat</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${users}">
+                            <td th:text="${'U' + #numbers.formatInteger(row.iduser,4)}"></td>
+                            <td th:text="${row.nomuser}"></td>
+                            <td th:text="${row.prenomuser}"></td>
+                            <td th:text="${row.mailuser}"></td>
+                            <td th:text="${row.profilesByIdprofile.desprofile}"></td>
+                            <td>
+                                            <span th:switch="${row.etat}">
+                                                <img th:case="0" src="/dist/img/redball.png" alt="Compte Désactivée">
+                                                <img th:case="1" src="/dist/img/greenball.png" alt="Compte Actif">
+                                            </span>
+                            </td>
+                            <td class="btn-user">
+                                <button type="button" class="btn-info-user btn btn-info btn-sm" name="btn-info-user"
+                                        th:id="${row.iduser}"><i
+                                        class="fas fa-search" alt="Informations sur l'Utilisateur"></i></button>
+
+                                <th:block th:switch="${row.etat}">
+                                    <th:block th:case="1">
+                                        <button type="button" class="btn-edit-user btn btn-success btn-sm"
+                                                name="btn-edit-user" th:id="${row.iduser}"><i
+                                                class="fas fa-edit" alt="Modifier l'Utilisateur"></i></button>
+                                        <button type="button" class="btn-delete-user btn btn-danger btn-sm"
+                                                th:name="${row.mailuser}" th:id="${row.iduser}"><i
+                                                class="fas fa-user-times" alt="Supprimer l'Utilisateur"></i></button>
+                                    </th:block>
+                                </th:block>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th>Identifiant Utilisateur</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Profile</th>
+                            <th>Etat</th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+
+<!-- NOUVEAU Modal -->
+<div class="modal fade" id="modal-users-nouveau" tabindex="-1" role="dialog" aria-labelledby="modal-users-noveau-titre"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modal-users-noveau-titre">
+                    Ajout d'un utilisateur
+                </h5>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div id="alert-users-ajoutmodal" style="margin: 20px;">
+
+                </div>
+
+                <form role="form" id="form-users-nouveau" name="form-users-nouveau">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Nom :
+                                <input type="text" maxlength="30" name="text-users-nouveau-nom"
+                                       id="text-users-nouveau-nom" class="form-control input-lg" placeholder="Nom"
+                                       tabindex="1" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Prénom :
+                                <input type="text" maxlength="30" name="text-users-nouveau-prenom"
+                                       id="text-users-nouveau-prenom" class="form-control input-lg" placeholder="Prénom"
+                                       tabindex="2" required="true">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        Adresse Email :
+                        <input type="email" maxlength="30" name="text-users-nouveau-email" id="text-users-nouveau-email"
+                               class="form-control input-lg" placeholder="Email Address" tabindex="4" required="true">
+                    </div>
+                    <div class="form-group">
+                        Numéro de Téléphone :
+                        <input type="text" maxlength="12" name="text-users-nouveau-telephone"
+                               id="text-users-nouveau-telephone" class="form-control input-lg"
+                               placeholder="N° Téléphone" tabindex="5">
+                    </div>
+                    <div class="form-group">
+                        Profile :
+                        <select class="selectpicker form-control" data-live-search="true"
+                                id="text-users-nouveau-profile" name="text-users-nouveau-profile" tabindex="6"
+                                required="true">
+                            <option th:each="profile : ${profiles}" th:data-tokens="${profile.desprofile}"
+                                    th:value="${profile.desprofile}"
+                                    th:text="${'P' + #numbers.formatInteger(profile.idprofile,3)+' | '+ profile.desprofile}"></option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Mot de passe :
+                                <input type="password" maxlength="15" name="text-users-nouveau-password1"
+                                       id="text-users-nouveau-password1" class="form-control input-lg"
+                                       placeholder="Mot de passe" tabindex="7" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Confirmation de Mot de passe :
+                                <input type="password" maxlength="15" name="text-users-nouveau-password2"
+                                       id="text-users-nouveau-password2" class="form-control input-lg"
+                                       placeholder="Confirmer Mot de passe" tabindex="8" required="true">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" id="btn-users-nouveau-fermer">Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btn-users-valider-fermer">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modif Modal -->
+<div class="modal fade" id="modal-users-modif" tabindex="-1" role="dialog" aria-labelledby="modal-users-modif-titre"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-users-modif-titre">
+                    Modifier un utilisateur
+                </h5>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div id="alert-users-modifmodal" style="margin: 20px;">
+
+                </div>
+
+                <form role="form" id="form-users-modif" name="form-users-modif">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <input type="hidden" id="hidded-id" name="custId">
+                                Nom :
+                                <input type="text" maxlength="30" name="text-users-modif-nom" id="text-users-modif-nom"
+                                       class="form-control input-lg" placeholder="Nom" tabindex="1" required="true">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Prénom :
+                                <input type="text" maxlength="30" name="text-users-modif-prenom"
+                                       id="text-users-modif-prenom" class="form-control input-lg" placeholder="Prénom"
+                                       tabindex="2" required="true">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        Adresse Email :
+                        <input type="email" maxlength="30" name="text-users-modif-email" id="text-users-modif-email"
+                               class="form-control input-lg" placeholder="Email Address" tabindex="4" required="true">
+                    </div>
+                    <div class="form-group">
+                        Numéro de Téléphone :
+                        <input type="text" maxlength="12" name="text-users-modif-telephone"
+                               id="text-users-modif-telephone" class="form-control input-lg" placeholder="N° Téléphone"
+                               tabindex="5">
+                    </div>
+                    <div class="form-group">
+                        Profile :
+                        <select class="selectpicker form-control" data-live-search="true" id="text-users-modif-profile"
+                                name="text-users-modif-profile" tabindex="6" required="true">
+                            <option th:each="profile : ${profiles}" th:data-tokens="${profile.desprofile}"
+                                    th:value="${profile.desprofile}"
+                                    th:text="${'P' + #numbers.formatInteger(profile.idprofile,3)+' | '+ profile.desprofile}"></option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Mot de passe :
+                                <input type="password" maxlength="15" name="text-users-modif-password1"
+                                       id="text-users-modif-password1" class="form-control input-lg"
+                                       placeholder="Mot de passe" tabindex="7">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                Confirmation de Mot de passe :
+                                <input type="password" maxlength="15" name="text-users-modif-password2"
+                                       id="text-users-modif-password2" class="form-control input-lg"
+                                       placeholder="Confirmer Mot de passe" tabindex="8">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" id="btn-users-modif-fermer">Fermer</button>
+                        <button type="submit" class="btn btn-primary" id="btn-users-modif-valider">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-users-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #FF7373">
+                <h4 class="modal-title" id="myModalLabel">Confirmation de Suppression d'un utilisateur</h4>
+            </div>
+            <div class="modal-body">
+                <div id="alert-users-deletemodal" style="margin: 20px;">
+
+                </div>
+
+                <div class="form-group">
+                    <input type="hidden" id="hidded-id-delete" name="hidded-id-delete">
+                    <input type="hidden" id="hidded-email-delete" name="hidded-email-delete">
+                    <p id="text-users-modal-delete">Voulez vous vraiment supprimer cet utilisateur ?</p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal" id="btn-users-delete-n">Non</button>
+                <button class="btn btn-danger" id="btn-users-delete-o">Oui</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.content -->
+<!-- page script -->
+<script>
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+    });
+
+    $('#text-users-nouveau-email').keyup(function () {
+        this.value = this.value.toLowerCase();
+    });
+
+    $('#text-users-modif-email').keyup(function () {
+        this.value = this.value.toLowerCase();
+    });
+
+    $('#text-users-modif-nom').keyup(function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    $('#text-users-nouveau-nom').keyup(function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    $('#text-users-modif-prenom').keyup(function () {
+        $(this).val($(this).val().substr(0, 1).toUpperCase() + $(this).val().substr(1).toLowerCase());
+    });
+
+    $('#text-users-nouveau-prenom').keyup(function () {
+        $(this).val($(this).val().substr(0, 1).toUpperCase() + $(this).val().substr(1).toLowerCase());
+    });
+
+    $(document).on("input", "#text-users-nouveau-telephone", function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    $(document).on("input", "#text-users-modif-telephone", function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    $(function () {
+        var table = $('#UserTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+        });
+    });
+</script>
+</body>
+</html>

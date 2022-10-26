@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="en">
+<head>
+    <style>
+        #imprimante_contextMenu {
+            position: absolute;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- Content Wrapper. Contains page content -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 id="title_Sup">Supervision des Imprimantes</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Supervision des Imprimantes</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-3 col-6">
+                        <!-- small box -->
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3 th:text="${actifprinters[0].replace(',','/')}"></h3>
+                                <p style="font-weight: bold;">Imprimantes Actif</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-printer"></i>
+                            </div>
+                            <!--                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>-->
+                        </div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-lg-3 col-6">
+                        <!-- small box -->
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3 th:text="${findDefPrinthead[0].replace(',','/')}"></h3>
+
+                                <p style="font-weight: bold;">Têtes d'impression défectueuses</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-ios-printer-outline"></i>
+                            </div>
+                            <!--                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>-->
+                        </div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-lg-3 col-6">
+                        <!-- small box -->
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3 th:text="${PingPrinters[0].replace(',','/')}"></h3>
+                                <p style="font-weight: bold;">Imprimante Qui Ping</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-wifi"></i>
+                            </div>
+                            <!--                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>-->
+                        </div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-lg-3 col-6">
+                        <!-- small box -->
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3 th:text="${NumberOfRows}"></h3>
+
+                                <p style="font-weight: bold;">Nombres de Scan Efféctués</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                            <!--                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>-->
+                        </div>
+                    </div>
+                    <!-- ./col -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="supprinterTable" class="table table-bordered table-hover table-sm">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>Station</th>
+                                <th>Chantier</th>
+                                <th>Ligne</th>
+                                <th>Type</th>
+                                <th>Adresse IP</th>
+                                <th>Firmware</th>
+                                <th>Modèle</th>
+                                <th>Longueur d'impression</th>
+                                <th>Dot défectueuses</th>
+                                <th>Dérnier SCAN</th>
+                                <th>Statut</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="printer : ${printers}">
+                                <td th:text="${printer.lastping}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.maxprintheadtemp}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.minprintheadtemp}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.numberofdots}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.ipadresse}"></td>
+                                <td th:text="${printer.firmwareversion}"></td>
+                                <td th:text="${printer.freeram}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.totaldistanceprint}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.faultydotsprinthead}" style="font-weight: bold;"></td>
+                                <td th:text="${printer.usedram}"></td>
+                                <td>
+                                    <span th:switch="${printer.freememory}">
+                                        <img th:case="0" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="1" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="2" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="3" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="4" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="5" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="6" src="/dist/img/greenball.png" alt="Ping OK">
+                                        <img th:case="*" src="/dist/img/redball.png" alt="Ping KO">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div id="btn-reboot">
+                                        <button type="submit" class="btn-reboot-sup btn btn-warning"
+                                                th:id="${printer.ipadresse}" th:name="${printer.freeram}"><i
+                                                class="fa fa-refresh" aria-hidden="true"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+
+    <!-- /.row -->
+</section>
+
+
+<!-- /.content -->
+<!-- page script -->
+<script>
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+
+        $(window).on("unload", function (e) {
+            alert("call");
+            console.log("this will be triggered");
+        });
+    });
+
+    $(function () {
+        var table = $('#supprinterTable').DataTable({
+            "paging": true,
+            "pageLength": 500,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": false,
+            "info": true,
+            "autoWidth": false,
+            "lengthMenu": [10, 25, 50, 100, 500],
+        });
+    });
+
+</script>
+</body>
+</html>

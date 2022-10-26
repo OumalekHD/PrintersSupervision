@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="en">
+<head>
+
+</head>
+<body>
+<!-- Content Wrapper. Contains page content #############################################################################################################################################################"-->
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">Dashboard</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+
+        <!-- /.row -->
+        <!-- Main row -->
+        <div class="row">
+            <!-- Left col -->
+            <section class="col-lg-7 connectedSortable">
+                <!-- Custom tabs (Charts with tabs)-->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="ChartGetActifPrintersByDay" style="height: 370px; width: 100%;"></div>
+                    </div>
+                </div>
+                <!-- /.card -->
+
+                <!-- TO DO List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="ion ion-clipboard mr-1"></i>
+                            Historique Dots erronées des têtes des impressions
+                        </h5>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="printerstable" class="table table-bordered table-hover table-sm">
+                                <thead class="thead-dark">
+                                <tr>
+                                    <th>N° Série</th>
+                                    <th>Adresse IP</th>
+                                    <th>Firmware</th>
+                                    <th>Modèle</th>
+                                    <th>Longueur</th>
+                                    <th>last scan</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="printer : ${dashboardPrinters}">
+                                    <td>
+                                        <a class="printerfaultydots" href="#!" th:id="${printer.serialnumber}"
+                                           th:text="${printer.serialnumber}" style="font-weight: bold;"/>
+                                    </td>
+                                    <td th:text="${printer.ipadresse}" style="font-weight: bold;"></td>
+                                    <td th:text="${printer.firmwareversion}" style="font-weight: bold;"></td>
+                                    <td th:text="${printer.partnumber}" style="font-weight: bold;"></td>
+                                    <td th:text="${printer.totaldistanceprint}"></td>
+                                    <td th:text="${#dates.format(printer.dateanalyse, 'yyyy-MM-dd')}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.card-body
+                    <div class="card-footer clearfix">
+                        <button type="button" class="btn btn-info float-right"><i class="fas fa-plus"></i> Add item</button>
+                    </div>
+                    -->
+                </div>
+                <!-- /.card -->
+            </section>
+            <!-- /.Left col -->
+            <!-- right col (We are only adding the ID to make the widgets sortable)-->
+            <section class="col-lg-5 connectedSortable">
+
+                <div class="card">
+                    <div class="card-body">
+                        <div id="ChartGetNbPrintersByType" style="height: 370px; width: 100%;"></div>
+                    </div>
+                </div>
+
+            </section>
+            <!-- right col -->
+        </div>
+        <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Large modal -->
+
+<div id="printerdotsview" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+     aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="card">
+                <div class="card-body">
+                    <input type="hidden" id="printerserial" name="printerserial" value="0">
+                    <div id="chartgetfaultystats" style="height: 375px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.content -->
+<!-- /.content-wrapper ##########################################################################################################################################################################-->
+<script>
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+
+        $(window).on("unload", function (e) {
+            alert("call");
+            console.log("this will be triggered");
+        });
+    });
+
+    $(function () {
+        var table = $('#printerstable').DataTable({
+            "paging": true,
+            "pageLength": 10,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": false,
+            "info": true,
+            "autoWidth": false,
+        });
+    });
+</script>
+
+</body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    //=================================================== CHART - La disponibilité des imprimantes ==================================
+    var data = [];
+    var arr = [[${ChartGetActifPrintersByDay}]];
+
+    var y = 0;
+    var dataSeries = {type: "line"};
+    var dataPoints = [];
+
+    for (i = 0; i < arr.length; i++) {
+        dataPoints.push({
+            x: new Date(arr[i][0]),
+            y: arr[i][1]
+        });
+    }
+
+    dataSeries.dataPoints = dataPoints;
+    data.push(dataSeries);
+
+    var chart = new CanvasJS.Chart("ChartGetActifPrintersByDay", {
+        animationEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "la disponibilité des imprimantes"
+        },
+        axisX: {
+            labelFormatter: function (e) {
+                return CanvasJS.formatDate(e.value, "DD MMM YY");
+            },
+        },
+        axisY: {
+            valueFormatString: "#,###"
+        },
+        data: data
+    });
+    chart.render();
+
+    //=================================================== CHART - Nombre Total des Imprimantes selon le Modèle ==================================
+    var data = [];
+    var arr = [[${ChartGetNbPrintersByType}]];
+
+    for (i = 0; i < arr.length; i++) {
+        data.push({
+            name: arr[i][0] + " (" + arr[i][1] + " Imprimantes)",
+            y: Math.round((arr[i][1] / arr[i][2]) * 100),
+            exploded: true
+        });
+    }
+
+    var chart = new CanvasJS.Chart("ChartGetNbPrintersByType", {
+        exportEnabled: true,
+        animationEnabled: true,
+        title: {
+            text: "Nombre Total des Imprimantes par Modèle",
+            fontSize: 24
+        },
+        legend: {
+            cursor: "pointer",
+            itemclick: explodePie
+        },
+        data: [{
+            type: "pie",
+            showInLegend: true,
+            toolTipContent: "{name}: <strong>{y}%</strong>",
+            indexLabel: "{name} - {y}%",
+            dataPoints: data
+        }]
+    });
+    chart.render();
+
+
+    function explodePie(e) {
+        if (typeof (e.dataSeries.dataPoints[e.dataPointIndex].exploded) === "undefined" || !e.dataSeries.dataPoints[e.dataPointIndex].exploded) {
+            e.dataSeries.dataPoints[e.dataPointIndex].exploded = true;
+        } else {
+            e.dataSeries.dataPoints[e.dataPointIndex].exploded = false;
+        }
+        e.chart.render();
+    }
+
+    //=================================================== CHART - CHECK FAULTYDOT ==================================
+
+
+    /*]]>*/
+</script>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="en">
+<head>
+
+</head>
+<body>
+<!-- Content Wrapper. Contains page content -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Profiles</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Gestion des Profiles</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <!--<h3 class="card-title">Liste des Profiles</h3>-->
+                    <button type="button" class="btn-new-profile btn btn-success btn-sm" id="btn-new-profile"
+                            title="Ajouter un nouveau profile" alt="Ajouter le profile"><i class="fas fa-newspaper"></i>
+                    </button>
+                    <button type="button" class="btn-export-profile btn btn-success btn-sm" id="btn-export-profile"
+                            title="Exporter la liste en Excel" alt="Exporter la liste en Excel"><i
+                            class="fas fa-file-export"></i></button>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <table id="TableProfile" class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Identifiant Profile</th>
+                            <th>Désignation</th>
+                            <th>Nb des Utilisateurs</th>
+                            <th>Etat</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${profiles}">
+                            <td th:text="${'P' + #numbers.formatInteger(row.idprofile,4)}"></td>
+                            <td th:text="${row.desprofile}"></td>
+                            <td th:text="${row.usercounter}"></td>
+                            <td>
+                                            <span th:switch="${row.etat}">
+                                                <img th:case="0" src="/dist/img/redball.png" alt="Profile Désactivée">
+                                                <img th:case="1" src="/dist/img/greenball.png" alt="Profile Actif">
+                                            </span>
+                            </td>
+                            <td class="btn-profile">
+                                <button type="button" class="btn-info-profile btn btn-info btn-sm"
+                                        name="btn-info-profile" th:id="${row.idprofile}"><i
+                                        class="fas fa-search"></i></button>
+
+                                <th:block th:switch="${row.etat}">
+                                    <th:block th:case="1">
+                                        <button type="button" class="btn-edit-profile btn btn-success btn-sm"
+                                                name="btn-edit-profile" th:id="${row.idprofile}"><i
+                                                class="fas fa-edit"></i></button>
+                                        <button type="button" class="btn-delete-profile btn btn-danger btn-sm"
+                                                th:name="${row.desprofile}" th:id="${row.idprofile}"><i
+                                                class="fas fa-remove-format"></i></button>
+                                    </th:block>
+                                </th:block>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th>Identifiant Profile</th>
+                            <th>Désignation</th>
+                            <th>Prénom</th>
+                            <th>Etat</th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+
+<!-- NOUVEAU Modal -->
+<div class="modal fade" id="modal-profiles-nouveau" tabindex="-1" role="dialog"
+     aria-labelledby="modal-profiles-nouveau-titre"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modal-profiles-nouveau-titre">
+                    Ajout d'un profile
+                </h5>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div id="alert-profiles-ajoutmodal" style="margin: 20px;">
+
+                </div>
+
+                <form role="form" id="form-profiles-nouveau" name="form-profiles-nouveau">
+                    <div class="form-group">
+                        Nom de Nouveau Profile :
+                        <input type="text" maxlength="30" name="text-profiles-ajout-nameprofile"
+                               id="text-profiles-ajout-nameprofile" class="form-control" placeholder="Nom Profile"
+                               tabindex="4" required="true">
+                    </div>
+                    <div class="row">
+                        <table id="TableAccess" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Menu</th>
+                                <th>Consultation</th>
+                                <th>Ajout</th>
+                                <th>Modification</th>
+                                <th>Suppression</th>
+                                <th>Exportation</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="menu : ${menus}">
+                                <td th:text="${menu.desmenu}"></td>
+                                <td>
+                                    <select name="text-Acces-Ajout-profile">
+                                        <option value="0">Non</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select name="text-Ajout-Ajout-profile">
+                                        <option value="0">Non</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select name="text-Modif-Ajout-profile">
+                                        <option value="0">Non</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select name="text-Delete-Ajout-profile">
+                                        <option value="0">Non</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select name="text-Export-Ajout-profile">
+                                        <option value="0">Non</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Menu</th>
+                                <th>Consultation</th>
+                                <th>Ajout</th>
+                                <th>Modification</th>
+                                <th>Suppression</th>
+                                <th>Exportation</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" id="btn-profiles-nouveau-fermer">Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btn-profiles-valider-fermer">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modif Modal -->
+<div class="modal fade" id="modal-profiles-modif" tabindex="-1" role="dialog"
+     aria-labelledby="modal-profiles-modif-titre"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modal-modif-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-profiles-modif-titre">
+                    Modifier un profile
+                </h5>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div id="alert-profiles-modifmodal" style="margin: 20px;">
+
+                </div>
+
+                <form role="form" id="form-profiles-modif" name="form-profiles-modif">
+                    <div class="form-group">
+                        Nom du Profile :
+                        <input type="text" maxlength="30" name="text-profiles-modif-nameprofile"
+                               id="text-profiles-modif-nameprofile" class="form-control" placeholder="Nom Profile"
+                               tabindex="4" required="true">
+                        <input type="hidden" id="hidded-id-modif" name="hidded-id-modif">
+                    </div>
+                    <div class="row">
+                        <table id="TableAccessmodif" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Menu</th>
+                                <th>Consultation</th>
+                                <th>Ajout</th>
+                                <th>Modification</th>
+                                <th>Suppression</th>
+                                <th>Exportation</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Menu</th>
+                                <th>Consultation</th>
+                                <th>Ajout</th>
+                                <th>Modification</th>
+                                <th>Suppression</th>
+                                <th>Exportation</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-profiles-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #FF7373">
+                <h4 class="modal-title" id="myModalLabel">Confirmation de Suppression d'un profile</h4>
+            </div>
+            <div class="modal-body">
+                <div id="alert-profiles-deletemodal" style="margin: 20px;">
+
+                </div>
+
+                <div class="form-group">
+                    <input type="hidden" id="hidded-id-delete" name="hidded-id-delete">
+                    <input type="hidden" id="hidded-email-delete" name="hidded-email-delete">
+                    <p id="text-profiles-modal-delete">Voulez vous vraiment supprimer ce profile ?</p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal" id="btn-profiles-delete-n">Non</button>
+                <button class="btn btn-danger" id="btn-profiles-delete-o">Oui</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.content -->
+<!-- page script -->
+<script>
+    $(function () {
+        var table = $('#table').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+        });
+    });
+
+    $('select[name="text-Acces-Ajout-profile"]').on("change", function () {
+        var id = $('select[name="text-Acces-Ajout-profile"]').val();
+
+        if (id == "1")
+            $('select[name="text-Acces-Ajout-profile"]').css('background-color', 'green');
+        else
+            $('select[name="text-Acces-Ajout-profile"]').css('background-color', 'red');
+    });
+
+    $('select[name="text-Ajout-Ajout-profile"]').on("change", function () {
+        var id = $('select[name="text-Ajout-Ajout-profile"]').val();
+
+        if (id == "1")
+            $('select[name="text-Ajout-Ajout-profile"]').css('background-color', 'green');
+        else
+            $('select[name="text-Ajout-Ajout-profile"]').css('background-color', 'red');
+    });
+
+    $('select[name="text-Modif-Ajout-profile"]').on("change", function () {
+        var id = $('select[name="text-Modif-Ajout-profile"]').val();
+
+        if (id == "1")
+            $('select[name="text-Modif-Ajout-profile"]').css('background-color', 'green');
+        else
+            $('select[name="text-Modif-Ajout-profile"]').css('background-color', 'red');
+    });
+
+    $('select[name="text-Delete-Ajout-profile"]').on("change", function () {
+        var id = $('select[name="text-Delete-Ajout-profile"]').val();
+
+        if (id == "1")
+            $('select[name="text-Delete-Ajout-profile"]').css('background-color', 'green');
+        else
+            $('select[name="text-Delete-Ajout-profile"]').css('background-color', 'red');
+    });
+
+    $('select[name="text-Export-Ajout-profile"]').on("change", function () {
+        var id = $('select[name="text-Export-Ajout-profile"]').val();
+
+        if (id == "1")
+            $('select[name="text-Export-Ajout-profile"]').css('background-color', 'green');
+        else
+            $('select[name="text-Export-Ajout-profile"]').css('background-color', 'red');
+    });
+
+</script>
+</body>
+</html>
